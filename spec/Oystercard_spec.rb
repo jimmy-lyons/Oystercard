@@ -17,4 +17,40 @@ describe Oystercard do
 
   end
 
+  describe '#deduct' do
+
+    it 'deducts money from the card' do
+      subject.top_up(20)
+      expect{ subject.deduct 5 }.to change{ subject.balance }.by -5
+    end
+
+  end
+
+  describe '#in_journey?' do
+
+    it 'card is not in journey when initialised' do
+      expect(subject).not_to be_in_journey
+    end
+
+  end
+
+  describe '#touch_in' do
+
+    it 'changes card state to "in journey"' do
+      subject.touch_in
+      expect(subject).to be_in_journey
+    end
+
+  end
+
+  describe '#touch_out' do
+
+    it 'changes card state in_journey to false' do
+      subject.touch_in
+      subject.touch_out
+      expect(subject).not_to be_in_journey
+    end
+
+  end
+
 end
