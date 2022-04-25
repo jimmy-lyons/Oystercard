@@ -1,6 +1,7 @@
 require 'oystercard'
 
 describe Oystercard do
+  
   it 'New instances of Oystercard have a balance of zero' do
     expect(subject.balance).to eq(0) 
   end
@@ -17,14 +18,15 @@ describe Oystercard do
 
   end
 
-  describe '#deduct' do
+  # REMOVED - test redundant because it is covered by 'deducts fare from card balance'
+  # describe '#deduct' do
 
-    it 'deducts money from the card' do
-      subject.top_up(20)
-      expect{ subject.deduct 5 }.to change{ subject.balance }.by -5
-    end
+  #   it 'deducts money from the card' do
+  #     subject.top_up(20)
+  #     expect{ subject.deduct 5 }.to change{ subject.balance }.by -5
+  #   end
 
-  end
+  # end
 
   describe '#in_journey?' do
 
@@ -37,8 +39,13 @@ describe Oystercard do
   describe '#touch_in' do
 
     it 'changes card state to "in journey"' do
+      subject.top_up(Oystercard::TRAVEL_MINIMUM)
       subject.touch_in
       expect(subject).to be_in_journey
+    end
+
+    it "doesn't allow you to touch in if balance is less than £1" do
+      expect{ subject.touch_in }.to raise_error "Insufficient balance"
     end
 
   end
@@ -46,9 +53,17 @@ describe Oystercard do
   describe '#touch_out' do
 
     it 'changes card state in_journey to false' do
+      subject.top_up(Oystercard::TRAVEL_MINIMUM)
       subject.touch_in
       subject.touch_out
       expect(subject).not_to be_in_journey
+    end
+
+    it 'deducts fare from card balance' do
+      subject.top_up(Oystercard::TRAVEL_MINIMUM)
+      subject.touch_in
+      
+      expect{ subject.touch_out }.to change{ subject.balance }.by(-Oystercard::MIN_FARE)
     end
 
   end
